@@ -1,0 +1,58 @@
+import json
+
+
+def assertJSON(node, key=None, type=None):
+    assert key or type
+    if type:
+        if not isinstance(node, type):
+            print "node %s is not a %s" % (node, type)
+            exit(1)
+    if key:
+        if key not in node:
+            print "node %s does not have child %s" % (node, key)
+
+
+def jsonKey(node, key):
+    assertJSON(node, key=key)
+    return node[key]
+
+
+class Target(object):
+    def __init__(self, top, subtree):
+        self.limits = top.get('limits', [0])
+        if 'limits' in subtree:
+            self.limits = subtree['limits']
+        self.id = jsonKey(subtree, 'id')
+        self.label = jsonKey(subtree, 'label')
+        self.source = jsonKey(subtree, 'src')
+
+
+class Statistic(object):
+    def __init__(self, top, subtree):
+        self.label = jsonKey(subtree, 'label')
+        self.id = jsonKey(subtree, 'id')
+        self.counter = jsonKey(subtree, 'counter')
+        self.args = subtree.get('args', [])
+        self.kwargs = subtree.get('kwargs', {})
+
+
+class Orders(object):
+    def __init__(self, targetJSON, statsJSON):
+        self.defaultLimits = targetJSON.get('limits', [0])
+        self.format = jsonKey(targetJSON, 'format')
+        self.targets = [Target(target)
+            for target in jsonKey(targetJSON['targets'])]
+        assertJSON(statsJSON, type=list)
+        self.stats = [Statistic(stat) for stat in statsJSON]
+
+def unpackJSON(targetPath, statsPath):
+    """
+    Parses JSON, combines it into an object
+    """
+    with open(os.path.expanduser(targetPath)) as f:
+        targetJSON = json.load(f)
+
+    with open(os.path.expanduser(statsPath)) as f:
+        statsJSON = json.load(f)
+
+    return Orders(targetJSON, statsJSON)
