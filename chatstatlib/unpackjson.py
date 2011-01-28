@@ -5,11 +5,11 @@ def assertJSON(node, key=None, type=None):
     assert key or type
     if type:
         if not isinstance(node, type):
-            print "node %s is not a %s" % (node, type)
+            print "node {0} is not a {1}".format(node, type)
             exit(1)
     if key:
         if key not in node:
-            print "node %s does not have child %s" % (node, key)
+            print "node {0} does not have child {1}".format(node, key)
 
 
 def jsonKey(node, key):

@@ -22,7 +22,7 @@ def lineParser():
 
         match = LINE_RE.match(line)
         if not match:
-            raise Exception("invalid line %i: %s" % (lineno, line))
+            raise Exception("invalid line {0}: {1}".format(lineno, line))
         t = match.group("time")
         time_struct = time.strptime(t, TIME_FORMAT)
         subject = match.group("subject").strip()

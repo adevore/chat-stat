@@ -69,7 +69,7 @@ def main():
         lineParser = formatModule.lineParser()
         chatstatlib.parseFile(fileName, lineParser, messageCallbacks)
         if opts.verbose:
-            print "(%.4f seconds)" % (time.time() - start)
+            print "({0:.3} seconds".format(time.time() - start)
 
     rank = chatstatlib.counterToRank(counter)
     if opts.limit:

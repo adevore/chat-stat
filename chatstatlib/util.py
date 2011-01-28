@@ -16,9 +16,9 @@ def parseLineCallback(func):
 def rankToFile(fp, rank):
     for i, (nick, count) in zip(itertools.count(1), rank):
         if isinstance(count, (int, long)):
-            s = "%i %s %i\n" % (i, nick, count)
+            s = "{rank} {nick} {count}".format(i, nick, count)
         else:
-            s = "%i %s %.3f\n" % (i, nick, count)
+            s = "{rank} {nick} {count:.4}".format(i, nick, count)
         fp.write(s)
 
 def findFiles(sources, regexp=None):
@@ -26,7 +26,7 @@ def findFiles(sources, regexp=None):
     for source in sources:
         source = os.path.abspath(os.path.expanduser(source))
         if not exists(source):
-            print "file path %s does not exist" % source
+            print "file path {0} does not exist".format(source)
             exit(1)
         elif isfile(source):
             result.add(source)
