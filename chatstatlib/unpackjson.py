@@ -1,4 +1,4 @@
-import json
+import json, os
 
 
 def assertJSON(node, key=None, type=None):
@@ -17,9 +17,9 @@ def jsonKey(node, key):
     return node[key]
 
 
-class Target(object):
-    def __init__(self, top, subtree):
-        self.limits = top.get('limits', [0])
+class Channel(object):
+    def __init__(self, parent, subtree):
+        self.limits = parent.defaultLimits
         if 'limits' in subtree:
             self.limits = subtree['limits']
         self.id = jsonKey(subtree, 'id')
@@ -28,7 +28,7 @@ class Target(object):
 
 
 class Statistic(object):
-    def __init__(self, top, subtree):
+    def __init__(self, parent, subtree):
         self.label = jsonKey(subtree, 'label')
         self.id = jsonKey(subtree, 'id')
         self.counter = jsonKey(subtree, 'counter')
@@ -40,10 +40,10 @@ class Orders(object):
     def __init__(self, targetJSON, statsJSON):
         self.defaultLimits = targetJSON.get('limits', [0])
         self.format = jsonKey(targetJSON, 'format')
-        self.targets = [Target(target)
-            for target in jsonKey(targetJSON['targets'])]
+        self.channels = [Channel(self, target)
+            for target in jsonKey(targetJSON, 'targets')]
         assertJSON(statsJSON, type=list)
-        self.stats = [Statistic(stat) for stat in statsJSON]
+        self.stats = [Statistic(self, stat) for stat in statsJSON]
 
 def unpackJSON(targetPath, statsPath):
     """
