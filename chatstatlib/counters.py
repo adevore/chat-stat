@@ -186,8 +186,6 @@ counters = {
     'cuss': partial(wordFrequency, CUSS_WORDS),
     'cusscount': partial(wordCount, CUSS_WORDS + ["penguin"]),
     'joins': joins,
-    'phphater': partial(hateful, name="php"),
-    'phplover': partial(generous, name="php"),
     'beerfan': partial(generous, name="beer"),
     'exclamation': partial(wordFrequency,
                    ['!' * EXCLAMATION_MINIMUM], multiple=False),
@@ -198,7 +196,8 @@ counters = {
     'hated': hated,
     'loved': loved,
     'relaycount': relayCount,
-    'smpbot': partial(relayCount, '<', '>', "SMP-Bot")
+    'smpbotrelay': partial(relayCount, '<', '>', "SMP-Bot"),
+    'mcbotrelay': partial(relayCount, '<', '>'),
     }
 
 
