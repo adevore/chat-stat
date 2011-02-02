@@ -14,11 +14,12 @@ def parseLineCallback(func):
 
 
 def rankToFile(fp, rank):
+    fp.write(u"rank nick count\n")
     for i, (nick, count) in zip(itertools.count(1), rank):
         if isinstance(count, (int, long)):
-            s = "{0} {1} {2}\n".format(i, nick, count)
+            s = u"{0} {1} {2}\n".format(i, nick, count)
         else:
-            s = "{0} {1} {2:.4}\n".format(i, nick, count)
+            s = u"{0} {1} {2:.4}\n".format(i, nick, count)
         fp.write(s)
 
 def findFiles(sources, regexp=None):
@@ -26,7 +27,7 @@ def findFiles(sources, regexp=None):
     for source in sources:
         source = os.path.abspath(os.path.expanduser(source))
         if not exists(source):
-            print "file path {0} does not exist".format(source)
+            print u"file path {0} does not exist".format(source)
             exit(1)
         elif isfile(source):
             result.add(source)

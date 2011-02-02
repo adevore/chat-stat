@@ -10,7 +10,7 @@ def parseFile(fileName, lineCallback, statCallbacks):
     statCallbacks: list of callbacks if lineCallback != None
     """
 
-    with codecs.open(fileName) as f:
+    with codecs.open(fileName, encoding="utf8", errors='replace') as f:
         for line in f:
             line = line.rstrip("\r\n")
             messageData = lineCallback(line)
