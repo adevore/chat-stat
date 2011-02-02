@@ -6,7 +6,7 @@ from . import weechat
 from .counters import counters, counterToRank
 from .parser import parseFile
 from .unpackjson import unpackJSON
-from .util import findFiles
+from .util import findFiles, rankToFile, rankToJSON
 
 formats = {
     'irssi': irssi,
