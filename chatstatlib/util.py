@@ -1,5 +1,6 @@
 import functools, itertools, os
 from os.path import exists, isfile, isdir
+import json
 
 def parseLineCallback(func):
     """
@@ -21,6 +22,13 @@ def rankToFile(fp, rank):
         else:
             s = u"{0} {1} {2:.4}\n".format(i, nick, count)
         fp.write(s)
+
+
+def rankToJSON(fp, rank):
+    dumpable = []
+    for nick, count in rank:
+        dumpable.append({'count': count, 'nick': nick})
+    json.dump(dumpable, fp)
 
 def findFiles(sources, regexp=None):
     result = set()
