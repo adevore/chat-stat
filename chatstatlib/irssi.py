@@ -1,5 +1,6 @@
 import re
 import time
+import os
 from itertools import count
 from . import util
 
@@ -16,6 +17,8 @@ IGNORE_RES = [
     re.compile(r"\d{2}:\d{2} !.*invited.*$"), # invite to channel
     re.compile(r"^--- Log closed.*"),
     re.compile(r"\d{2}:\d{2} -!- [^\s]+ is now known as"),
+    re.compile(r"\d{2}:\d{2} -!- Irssi: Starting query"),
+    re.compile(r"\d{2}:\d{2} -!- Irssi: [^:]+: Total of \d+ nicks"),
     NICK_CHANGE_RE,
     USER_MODE_RE,
     ]
@@ -28,6 +31,9 @@ JOIN_PART_RE = re.compile(r"(?P<time>\d{2}:\d{2}) -!- (?P<nick>[^\s]+) \[[^\]]+\
 LOG_OPEN_TIME = "%a %b %d %H:%M:%S %Y"
 DAY_CHANGE_TIME = "%a %b %j %Y"
 MESSAGE_TIME = "%H:%M"
+
+PATH_FORMAT_NETWORK = ["{network}", "{channel}.log"]
+PATH_FORMAT_NO_NETWORK = "{channel}.log"
 
 def updateHourMinute(then, timestamp):
     """
@@ -99,3 +105,21 @@ def lineParser():
         else:
             #raise Exception("Invalid line %i in file: %s" % (lineno, line))
             pass
+
+
+def formatPath(**kwargs):
+    if "network" in kwargs:
+        return os.path.join(*(s.format(**kwargs)
+            for s in PATH_FORMAT_NETWORK))
+    else:
+        return PATH_FORMAT_NO_NETWORK.format(**kwargs)
+
+
+def findChannelFiles(root, channel, network=None):
+    formatting = {'channel': channel}
+    if network:
+        formatting['network'] = network
+    if channel == "":
+        return util.findFiles([root], regexp=LOG_FILE_NAME_RE)
+    else:
+        return [os.path.join(root, formatPath(**formatting))]

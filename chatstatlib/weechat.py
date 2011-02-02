@@ -4,7 +4,7 @@ import re
 import time
 from itertools import count
 
-from . import util
+from . import util, unpackjson
 
 LOG_FILE_NAME_RE = re.compile(r"irc.(?P<net>[^.]+)\.(?P<chan>[^.]+).weechatlog")
 PERMISSIONS_SYMBOLS = "+@%" # argument to str.strip is a string
@@ -13,6 +13,7 @@ TIMESTAMP_RE = r"(?P<time>[^\t]+)"
 LINE_RE = re.compile(TIMESTAMP_RE + r"\t(?P<subject>[^\t]*)\t(?P<msg>.+)")
 
 TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+PATH_FORMAT = "irc.{network}.{channel}.weechatlog"
 
 @util.parseLineCallback
 def lineParser():
@@ -73,3 +74,12 @@ def lineParser():
                 'msg': msg,
                 'type': 'regular'}
 
+
+def formatPath(**kwargs):
+    if not kwargs.get('network', None):
+        raise unpackjson.error("Weechat requires a network")
+    PATH_FORMAT.format(**kwargs)
+
+
+def findChannelFiles(root, channel, network=None):
+    return [os.path.join(root, formatPath(channel=channel, network=network))]
