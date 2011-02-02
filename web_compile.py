@@ -12,8 +12,6 @@ TEMPLATE_NAME = "index-template.html"
 
 USAGE = "%prog [options] <target config> <stats config>"
 options = optparse.OptionParser(usage=USAGE)
-options.add_option("-o", "--outfile", default="-", dest="outfile",
-    help="Output file (\"-\" for stdout, defaults to stdout)")
 
 
 def checkPaths(target, stats, outfile):
@@ -38,8 +36,6 @@ def compileTemplate(tree):
     return template.render(channels=tree.channels, stats=tree.stats)
 
 
-
-
 def main():
     opts, args = options.parse_args()
     if len(args) not in (2, 3):
@@ -54,6 +50,7 @@ def main():
     checkPaths(targetConfigPath, statsConfigPath, outfile)
     if outfile:
         out = open(outfile, 'w')
+        os.chmod(outfile, 0755)
     else:
         out = sys.stdout
     tree = unpackJSON(targetConfigPath, statsConfigPath)
