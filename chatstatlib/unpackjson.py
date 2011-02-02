@@ -1,49 +1,76 @@
 import json, os
 
+from .counters import counters
+
+class FormatError(Exception):
+    pass
 
 def assertJSON(node, key=None, type=None):
     assert key or type
     if type:
         if not isinstance(node, type):
-            print "node {0} is not a {1}".format(node, type)
+            raise FormatError("node {0} is not a '{1}'".format(node, type.__name__))
             exit(1)
-    if key:
-        if key not in node:
-            print "node {0} does not have child {1}".format(node, key)
+    if key and key not in node:
+        raise FormatError("node {0} does not have child {1}".format(node, key))
 
 
-def jsonKey(node, key):
-    assertJSON(node, key=key)
-    return node[key]
+def jsonKey(node, key, type=None, default=None):
+    if key not in node:
+        if default is not None:
+            return default
+        else:
+            raise FormatError("node {0} does not have child {1}".format(node, key))
+    value = node[key]
+    if type and not isinstance(value, type):
+        raise FormatError("node {0} is not a '{1}'".format(node, type.__name__))
+    return value
 
 
 class Channel(object):
+    """
+    Channel target information
+    """
+
     def __init__(self, parent, subtree):
-        self.limits = parent.defaultLimits
-        if 'limits' in subtree:
-            self.limits = subtree['limits']
-        self.id = jsonKey(subtree, 'id')
-        self.label = jsonKey(subtree, 'label')
-        self.source = jsonKey(subtree, 'src')
+        self.id = jsonKey(subtree, 'id', type=unicode)
+        self.label = jsonKey(subtree, 'label', type=unicode)
+        self.source = jsonKey(subtree, 'src', default="", type=unicode)
+        self.network = jsonKey(subtree, 'network',
+                       default=parent.network, type=unicode)
 
 
 class Statistic(object):
     def __init__(self, parent, subtree):
-        self.label = jsonKey(subtree, 'label')
-        self.id = jsonKey(subtree, 'id')
-        self.counter = jsonKey(subtree, 'counter')
-        self.args = subtree.get('args', [])
-        self.kwargs = subtree.get('kwargs', {})
+        self.limits = jsonKey(subtree, 'limits',
+                      default=parent.defaultLimits, type=list)
+        self.label = jsonKey(subtree, 'label', type=unicode)
+        self.id = jsonKey(subtree, 'id', type=unicode)
+        self.counter = jsonKey(subtree, 'counter', type=unicode)
+        self.args = jsonKey(subtree, 'args', default=[], type=list)
+        self.kwargs = jsonKey(subtree, 'kwargs', default={}, type=dict)
+
+        if self.counter not in counters:
+            raise FormatError("counter {0} does not exist".format(self.counter))
+
+    def new(self):
+        return counters[self.counter](*self.args, **self.kwargs)
 
 
 class Orders(object):
     def __init__(self, targetJSON, statsJSON):
-        self.defaultLimits = targetJSON.get('limits', [0])
-        self.format = jsonKey(targetJSON, 'format')
-        self.channels = [Channel(self, target)
-            for target in jsonKey(targetJSON, 'targets')]
         assertJSON(statsJSON, type=list)
+        assertJSON(targetJSON, type=dict)
+        self.defaultLimits = jsonKey(targetJSON, 'limits',
+                             default=[0], type=list)
+        self.format = jsonKey(targetJSON, 'format', type=unicode)
+        self.network = jsonKey(targetJSON, 'network',
+                       default=None, type=unicode)
+        self.channels = [Channel(self, target)
+            for target in jsonKey(targetJSON, 'targets', type=list)]
+
         self.stats = [Statistic(self, stat) for stat in statsJSON]
+
 
 def unpackJSON(targetPath, statsPath):
     """
