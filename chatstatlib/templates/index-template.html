@@ -56,7 +56,7 @@
       <ul id="{{channel.id}}-ul">
 				{% for stat in stats %}
 				<li>{{stat.label}}
-				  {% for limit in channel.limits %}
+				  {% for limit in stat.limits %}
 				    {% if limit == 0 %}
 				      <a href="{{channel.id}}-{{stat.id}}-all.txt">All</a>
             {% else %}
@@ -69,7 +69,7 @@
 				</li>
 				{% endfor %}
 	    </ul>
-		{% endfor %}
     </div>
+		{% endfor %}
   </body>
 </html>
