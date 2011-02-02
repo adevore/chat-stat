@@ -6,6 +6,8 @@ import re
 from collections import defaultdict
 from functools import partial
 
+
+
 # cuss words in a separate file for those with delicate eyes
 with open('cuss_words.txt') as f:
     CUSS_WORDS = [line.strip() for line in f]
@@ -19,6 +21,7 @@ THING_SUBPATTERN = r"(\(([^)]+)\)|[\w]+)"
 KARMA_INCREMENT = re.compile(THING_SUBPATTERN + "\+\+")
 KARMA_DECREMENT = re.compile(THING_SUBPATTERN + "--")
 BOT_RELAY_PATTERN = "{begin}(?P<nick>[^{end}]+){end} (?P<msg>.*)"
+SHE_SAID = ["that's what she said", "thats what she said"]
 
 def counter(generator):
     """
@@ -63,13 +66,29 @@ def wordFrequency(c, words, multiple=True):
 
 
 @counter
-def wordCount(c, words=None):
+def wordCount(c, words=None, caseSensitive=False):
+    if not caseSensitive and words:
+        words = set([word.lower() for word in words])
     while True:
         msg = yield
         if msg['type'] in ('regular', 'me'):
             for word in WORD_SPLIT_RE.findall(msg['msg']):
-                if not words or word in words:
+                if not words or word.lower() in words:
                     c[word] += 1
+
+
+@counter
+def phraseCount(c, phrases, caseSensitive=False):
+    if not caseSensitive:
+        phrases = set([phrase.lower() for phrase in phrases])
+    else:
+        phrases = set(phrases)
+    while True:
+        msg = yield
+        if msg['type'] in ('regular', 'me'):
+            for phrase in phrases:
+                if phrase in msg['msg'].lower():
+                    c[msg['nick']] += 1
 
 
 @counter
@@ -184,7 +203,7 @@ counters = {
     'generous': generous,
     'hateful': hateful,
     'cuss': partial(wordFrequency, CUSS_WORDS),
-    'cusscount': partial(wordCount, CUSS_WORDS + ["penguin"]),
+    'cusscount': partial(wordCount, CUSS_WORDS + ["penguin", "yermom"]),
     'joins': joins,
     'beerfan': partial(generous, name="beer"),
     'exclamation': partial(wordFrequency,
@@ -198,6 +217,7 @@ counters = {
     'relaycount': relayCount,
     'smpbotrelay': partial(relayCount, '<', '>', "SMP-Bot"),
     'mcbotrelay': partial(relayCount, '<', '>'),
+    'shesaid': partial(phraseCount, SHE_SAID),
     }
 
 
