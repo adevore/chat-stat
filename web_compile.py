@@ -1,5 +1,6 @@
 import optparse
-import os, sys
+import os
+import sys
 from os.path import dirname, expanduser, exists, abspath
 
 import jinja2

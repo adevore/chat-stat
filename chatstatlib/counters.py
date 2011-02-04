@@ -7,7 +7,6 @@ from collections import defaultdict
 from functools import partial
 
 
-
 # cuss words in a separate file for those with delicate eyes
 with open('cuss_words.txt') as f:
     CUSS_WORDS = [line.strip() for line in f]
@@ -23,6 +22,7 @@ KARMA_DECREMENT = re.compile(THING_SUBPATTERN + "--")
 BOT_RELAY_PATTERN = "{begin}(?P<nick>[^{end}]+){end} (?P<msg>.*)"
 SHE_SAID = ["that's what she said", "thats what she said"]
 
+
 def counter(generator):
     """
     Function decorator to create a generator factory wrapper
@@ -35,12 +35,14 @@ def counter(generator):
         return d, sink.send
     return factory
 
+
 @counter
 def talk(c):
     while True:
         msg = yield
         if msg['type'] in ('regular', 'me'):
             c[msg['nick']] += 1
+
 
 @counter
 def char(c):
@@ -109,6 +111,7 @@ def upperCount(c):
                 for word in words:
                     if len(word) > 1 and word.isupper():
                         c[word] += 1
+
 
 @counter
 def generous(c, name=""):
@@ -186,6 +189,7 @@ def flap(c, interval=FLAP_MAX_TIME):
             if now - lastLeave.get(msg['nick'], 0) < interval:
                 c[msg['nick']] += 1
 
+
 @counter
 def relayCount(c, begin, end, relayer=None,):
     regexp = re.compile(BOT_RELAY_PATTERN.format(begin=begin, end=end))
@@ -222,4 +226,4 @@ counters = {
 
 
 def counterToRank(d):
-    return sorted(d.items(), key=lambda v:v[1], reverse=True)
+    return sorted(d.items(), key=lambda v: v[1], reverse=True)

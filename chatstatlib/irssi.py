@@ -4,6 +4,8 @@ import os
 from itertools import count
 from . import util
 
+ENCODING = "utf8"
+
 LOG_FILE_NAME_RE = re.compile(r"[^.]+\.log")
 LOG_CHANNEL_NAME_RE = re.compile(r"#[^.]+\.log")
 
@@ -14,7 +16,7 @@ USER_MODE_RE = re.compile(r"(?P<time>\d{2}:{2}) -!- mode/(?P<chan>#[^s]+)\[?P<pe
 IGNORE_RES = [
     re.compile(r"^--- Log closed.*"),
     re.compile(r"\d{2}:\d{2} -[^:]+:#"),
-    re.compile(r"\d{2}:\d{2} !.*invited.*$"), # invite to channel
+    re.compile(r"\d{2}:\d{2} !.*invited.*$"),  # invite to channel
     re.compile(r"^--- Log closed.*"),
     re.compile(r"\d{2}:\d{2} -!- [^\s]+ is now known as"),
     re.compile(r"\d{2}:\d{2} -!- Irssi: Starting query"),
@@ -43,7 +45,7 @@ def updateHourMinute(then, timestamp):
     newTime = list(then)
     newTime[3] = int(hour)
     newTime[4] = int(minute)
-    newTime[5] = 0 # tm_sec
+    newTime[5] = 0  # tm_sec
     return time.struct_time(newTime)
 
 @util.parseLineCallback

@@ -30,12 +30,13 @@ def checkPaths(targetConfig, statsConfig, src, dest):
 
 def formatDestination(destDir, target, stat, ext, limit=0):
     formatting = {'channel': target.id, 'stat': stat.id,
-                  'limit': limit, 'ext':ext}
+                  'limit': limit, 'ext': ext}
     if limit == 0:
         fileName = TARGET_ALL_FORMAT.format(**formatting)
     else:
         fileName = TARGET_LIMIT_FORMAT.format(**formatting)
     return os.path.join(destDir, fileName)
+
 
 def parseFiles(tree, channel, srcDir, verbose):
     callbacks = []
@@ -53,7 +54,8 @@ def parseFiles(tree, channel, srcDir, verbose):
             print "parsing", fileName,
             start = time.time()
         lineParser = formatModule.lineParser()
-        chatstatlib.parseFile(fileName, lineParser, callbacks)
+        chatstatlib.parseFile(fileName, lineParser, callbacks,
+                              formatModule.ENCODING)
         if verbose:
             print "({0} seconds)".format(time.time() - start)
     return counters
@@ -68,8 +70,10 @@ def writeTarget(destDir, target, counters):
                 jsonName = formatDestination(destDir, target, stat, "json")
                 segment = ranked
             else:
-                flatName = formatDestination(destDir, target, stat, "txt", limit=limit)
-                jsonName = formatDestination(destDir, target, stat, "json", limit=limit)
+                flatName = formatDestination(destDir, target, stat,
+                                             "txt", limit=limit)
+                jsonName = formatDestination(destDir, target, stat,
+                                             "json", limit=limit)
                 segment = ranked[:limit]
             with codecs.open(flatName, 'w', 'utf8', 'replace') as f:
                 os.chmod(flatName, 0755)
@@ -77,6 +81,7 @@ def writeTarget(destDir, target, counters):
             with codecs.open(jsonName, 'w', 'utf8', 'replace') as f:
                 os.chmod(jsonName, 0755)
                 rankToJSON(f, segment)
+
 
 def main():
     opts, args = options.parse_args()
@@ -99,6 +104,7 @@ def main():
         writeTarget(destDir, channel, counters)
         if opts.verbose:
             print "({0:.4} seconds)".format(time.time() - start)
+
 
 if __name__ == '__main__':
     main()

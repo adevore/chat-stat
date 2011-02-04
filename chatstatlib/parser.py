@@ -1,7 +1,7 @@
 import codecs
 
 
-def parseFile(fileName, lineCallback, statCallbacks):
+def parseFile(fileName, lineCallback, statCallbacks, encoding):
     """
     Parses file using generators as coroutines. See PEP 342.
 
@@ -10,7 +10,7 @@ def parseFile(fileName, lineCallback, statCallbacks):
     statCallbacks: list of callbacks if lineCallback != None
     """
 
-    with codecs.open(fileName, encoding="utf8", errors='replace') as f:
+    with codecs.open(fileName, encoding=encoding, errors='ignore') as f:
         for line in f:
             line = line.rstrip("\r\n")
             messageData = lineCallback(line)

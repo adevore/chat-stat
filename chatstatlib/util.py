@@ -1,4 +1,6 @@
-import functools, itertools, os
+import functools
+import itertools
+import os
 from os.path import exists, isfile, isdir
 import json
 

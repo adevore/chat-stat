@@ -1,4 +1,6 @@
-import optparse, sys, itertools
+import optparse
+import sys
+import itertools
 from chatstatlib import counterToRank
 from chatstatlib.util import rankToFile
 
@@ -19,13 +21,13 @@ def main():
     ratios = {}
 
     with open(denominatorFile) as df:
-        df.next() # Get rid of header
+        df.next()  # Get rid of header
         for line in df:
             line = line.rstrip("\r\n")
             rank, name, count = line.split(' ')
             denominators[name] = int(count)
     with open(numeratorFile) as nf:
-        nf.next() # Get rid of header
+        nf.next()  # Get rid of header
         for line in nf:
             line = line.rstrip("\r\n")
             rank, name, count = line.split(' ')

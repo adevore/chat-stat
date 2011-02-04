@@ -59,7 +59,7 @@ def main():
         print "no log files found"
         return 1
 
-    lineParserGen = formatModule.lineParser # one generator per file
+    lineParserGen = formatModule.lineParser  # one generator per file
     counter, sink = chatstatlib.counters[opts.stat]()
     messageCallbacks = [sink]
     for fileName in fileNames:
@@ -67,7 +67,8 @@ def main():
             print "processing", fileName,
             start = time.time()
         lineParser = formatModule.lineParser()
-        chatstatlib.parseFile(fileName, lineParser, messageCallbacks)
+        chatstatlib.parseFile(fileName, lineParser, messageCallbacks,
+                              formatModule.ENCODING)
         if opts.verbose:
             print "({0:.3} seconds)".format(time.time() - start)
 

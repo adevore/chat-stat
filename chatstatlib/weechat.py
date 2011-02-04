@@ -6,8 +6,10 @@ from itertools import count
 
 from . import util, unpackjson
 
+ENCODING = None
+
 LOG_FILE_NAME_RE = re.compile(r"irc.(?P<net>[^.]+)\.(?P<chan>[^.]+).weechatlog")
-PERMISSIONS_SYMBOLS = "+@%" # argument to str.strip is a string
+PERMISSIONS_SYMBOLS = "+@%"  # argument to str.strip is a string
 
 TIMESTAMP_RE = r"(?P<time>[^\t]+)"
 LINE_RE = re.compile(TIMESTAMP_RE + r"\t(?P<subject>[^\t]*)\t(?P<msg>.+)")
@@ -23,7 +25,10 @@ def lineParser():
 
         match = LINE_RE.match(line)
         if not match:
-            raise Exception("invalid line {0}: {1}".format(lineno, line))
+            print [ord(c) for c in line]
+            raise Exception(u"invalid line {0}".format(lineno))
+            raise Exception(u"invalid line {0}: {1}".format(lineno, line))
+
         t = match.group("time")
         time_struct = time.strptime(t, TIME_FORMAT)
         subject = match.group("subject").strip()

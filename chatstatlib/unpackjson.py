@@ -1,9 +1,12 @@
-import json, os
+import json
+import os
 
 from .counters import counters
 
+
 class FormatError(Exception):
     pass
+
 
 def assertJSON(node, key=None, type=None):
     assert key or type
