@@ -37,6 +37,15 @@ def compileTemplate(tree):
     return template.render(channels=tree.channels, stats=tree.stats)
 
 
+def channelSortKey(channel):
+    label = channel.label
+    # Sort ##foo channels as if they're #foo
+    if label.startswith("#"):
+        return "#" + label.lstrip("#")
+    else:
+        return label
+
+
 def main():
     opts, args = options.parse_args()
     if len(args) not in (2, 3):
@@ -55,6 +64,8 @@ def main():
     else:
         out = sys.stdout
     tree = unpackJSON(targetConfigPath, statsConfigPath)
+    if tree.sort:
+        tree.channels.sort(key=channelSortKey)
     html = compileTemplate(tree)
     out.write(html)
 
